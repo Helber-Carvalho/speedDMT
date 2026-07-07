@@ -10,3 +10,5 @@ dist/
 env/
 venv/
 .venv/
+make_icon*.py
+temp_spec/
