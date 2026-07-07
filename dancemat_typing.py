@@ -293,8 +293,8 @@ creditos = criar_label_responsivo(
     font=("Segoe UI", 8),
     fg="#6cc24a",
     bg=COR_FUNDO,
-    pady=(0, 4),
+    pady=2,
 )
-creditos.pack(fill=tk.X)
+creditos.pack(fill=tk.X, pady=(0, 4))
 
 root.mainloop()
