@@ -5,11 +5,15 @@ import ctypes
 import os
 import sys
 
+
 def resource_path(relative_path):
+    """Retorna o caminho absoluto do recurso (funciona em script e .exe PyInstaller)."""
     if hasattr(sys, '_MEIPASS'):
         return os.path.join(sys._MEIPASS, relative_path)
     return os.path.join(os.path.abspath("."), relative_path)
 
+
+# Paleta de cores - tema verde escuro
 COR_FUNDO     = "#333333"
 COR_FRAME     = "#2a2a2a"
 COR_TITULO    = "#6cc24a"
@@ -25,11 +29,13 @@ COR_NIVEL4 = "#215732"
 COR_EXTRA       = "#44883e"
 COR_BOTAO_TEXTO = "#FFFFFF"
 
+# URLs dos níveis do BBC Dance Mat Typing
 URL_LEVEL1 = "https://www.bbc.co.uk/games/interactive/activity-dance-mat-typing?exitGameUrl=http%3A%2F%2Fwww.bbc.co.uk%2Fguides%2Fz3c6tfr"
 URL_LEVEL2 = "https://www.bbc.co.uk/games/interactive/activity-dance-mat-typing-level2?exitGameUrl=http%3A%2F%2Fwww.bbc.co.uk%2Fguides%2Fz3c6tfr"
 URL_LEVEL3 = "https://www.bbc.co.uk/games/interactive/activity-dance-mat-typing-level3?exitGameUrl=http%3A%2F%2Fwww.bbc.co.uk%2Fguides%2Fz3c6tfr"
 URL_LEVEL4 = "https://www.bbc.co.uk/games/interactive/activity-dance-mat-typing-level4?exitGameUrl=http%3A%2F%2Fwww.bbc.co.uk%2Fguides%2Fz3c6tfr"
 
+# Mapeamento: cada nível → (cor, lista de (nome_estágio, url))
 stages = {
     "N\u00edvel 1": (
         COR_NIVEL1,
@@ -70,6 +76,7 @@ def open_url(url):
     webbrowser.open(url)
 
 
+# Botão com cantos arredondados desenhado via Canvas
 def criar_botao_arredondado(parent, texto, cor_fundo, comando, altura=40, raio=14):
     canvas = tk.Canvas(
         parent,
@@ -128,6 +135,7 @@ def criar_botao_arredondado(parent, texto, cor_fundo, comando, altura=40, raio=1
     return canvas
 
 
+# Label com ajuste automático de wraplength
 def criar_label_responsivo(parent, text, **kwargs):
     label = tk.Label(parent, text=text, **kwargs)
 
@@ -140,6 +148,7 @@ def criar_label_responsivo(parent, text, **kwargs):
     return label
 
 
+# Define o ícone na janela e na barra de tarefas (Windows)
 def _set_app_icon(window):
     try:
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('speeddmt.typing.1')
@@ -157,6 +166,8 @@ def _set_app_icon(window):
     except:
         pass
 
+
+# Janela principal
 root = tk.Tk()
 root.title("Dance Mat Typing - Speed DMT 2")
 root.configure(bg=COR_FUNDO)
@@ -174,6 +185,7 @@ style.configure(
     gripcount=0,
 )
 
+# Tamanho proporcional 19:9 centralizado na tela
 sw = root.winfo_screenwidth()
 sh = root.winfo_screenheight()
 
@@ -192,6 +204,7 @@ root.minsize(800, 480)
 main = tk.Frame(root, bg=COR_FUNDO, padx=24, pady=20)
 main.pack(fill=tk.BOTH, expand=True)
 
+# Título
 titulo = criar_label_responsivo(
     main,
     text="Dance Mat Typing",
@@ -202,6 +215,7 @@ titulo = criar_label_responsivo(
 )
 titulo.pack(fill=tk.X)
 
+# Subtítulo
 subtitulo = criar_label_responsivo(
     main,
     text="Escolha um est\u00e1gio para praticar digita\u00e7\u00e3o!",
@@ -214,6 +228,7 @@ subtitulo.pack(fill=tk.X)
 
 ttk.Separator(main, orient="horizontal").pack(fill=tk.X, pady=12)
 
+# Container rolável (Canvas + Scrollbar)
 scroll_canvas = tk.Canvas(main, bg=COR_FUNDO, highlightthickness=0)
 scroll_bar = ttk.Scrollbar(main, orient="vertical", command=scroll_canvas.yview)
 scroll_canvas.configure(yscrollcommand=scroll_bar.set)
@@ -239,6 +254,7 @@ scroll_canvas.bind("<Leave>", _scroll_leave)
 scroll_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 scroll_bar.pack(side=tk.RIGHT, fill=tk.Y)
 
+# Botões dos estágios organizados por nível
 for level_name, (cor_nivel, stage_list) in stages.items():
     frame_nivel = tk.Frame(scroll_frame, bg=COR_FUNDO, pady=4)
     frame_nivel.pack(fill=tk.X, pady=3)
@@ -261,6 +277,7 @@ for level_name, (cor_nivel, stage_list) in stages.items():
 
 ttk.Separator(scroll_frame, orient="horizontal").pack(fill=tk.X, pady=10)
 
+# 10 Fast Fingers
 btn_10fast = criar_botao_arredondado(
     scroll_frame,
     "10 Fast Fingers - Text Practice (PT)",
@@ -273,6 +290,7 @@ btn_10fast = criar_botao_arredondado(
 )
 btn_10fast.pack(fill=tk.X, pady=4)
 
+# Rodapé
 rodape = criar_label_responsivo(
     scroll_frame,
     text="Desenvolvido para alunos aprenderem digita\u00e7\u00e3o de forma divertida!",

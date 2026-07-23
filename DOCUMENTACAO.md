@@ -44,14 +44,16 @@ flowchart TB
     end
 
     subgraph NAVEGADOR [Navegador Padrão]
-        K[BBC Dance Mat Typing<br/>Level 1/2/3]
+        K[BBC Dance Mat Typing<br/>Level 1/2]
+        M[BBC Dance Mat Typing<br/>Level 3]
+        N[BBC Dance Mat Typing<br/>Level 4]
         L[10 Fast Fingers - PT]
     end
 
     G1 & G2 & G3 -->|open_url| K
     H1 & H2 & H3 -->|open_url| K
-    I1 & I2 & I3 -->|open_url| K
-    J1 & J2 & J3 -->|open_url| K
+    I1 & I2 & I3 -->|open_url| M
+    J1 & J2 & J3 -->|open_url| N
     E -->|open_url| L
 
     style A fill:#6cc24a,color:#333,stroke:#333
@@ -67,6 +69,7 @@ flowchart TB
 ```
 ProjetoPy/
 ├── dancemat_typing.py    # Código fonte principal
+├── icon.ico              # Ícone personalizado
 ├── Speed DMT 2.exe       # Executável compilado (PyInstaller)
 └── DOCUMENTACAO.md       # Este arquivo
 ```
@@ -75,39 +78,46 @@ ProjetoPy/
 
 ```
 01. Importação das bibliotecas
-    ├── tkinter / ttk      → Interface gráfica
-    └── webbrowser          → Abrir URLs no navegador
+    ├── tkinter / ttk   → Interface gráfica
+    ├── webbrowser       → Abrir URLs no navegador
+    ├── ctypes           → API do Windows (ícone na barra de tarefas)
+    ├── os / sys         → resource_path para PyInstaller
 
-02. Constantes de cor
+02. Função auxiliar
+    └── resource_path()  → Localiza arquivos dentro do .exe (onefile)
+
+03. Constantes de cor
     ├── COR_FUNDO     → #333333 (cinza escuro)
     ├── COR_TITULO    → #6cc24a (lime green)
     ├── COR_NIVEL1..4 → gradiente verde claro → escuro
     └── COR_EXTRA     → #44883e (botão 10fastfingers)
 
-03. URLs dos estágios
+04. URLs dos estágios
     ├── URL_LEVEL1 → level 1 (estágios 1-3)
     ├── URL_LEVEL2 → level 2 (estágios 4-6)
-    └── URL_LEVEL3 → level 3 (estágios 7-12)
+    ├── URL_LEVEL3 → level 3 (estágios 7-9)
+    └── URL_LEVEL4 → level 4 (estágios 10-12)
 
-04. Dicionário stages
+05. Dicionário stages
     └── Mapeia cada nível → (cor, [(nome_estágio, url), ...])
 
-05. Funções auxiliares
+06. Funções auxiliares
     ├── open_url(url)               → webbrowser.open()
     ├── criar_botao_arredondado()   → Canvas com cantos arredondados
-    └── criar_label_responsivo()    → Label com wraplength dinâmico
+    ├── criar_label_responsivo()    → Label com wraplength dinâmico
+    └── _set_app_icon()             → Ícone na barra de tarefas (Win32 API)
 
-06. Configuração da janela (19:9 centralizado)
+07. Configuração da janela (19:9 centralizado)
     ├── root.geometry(...)  → tamanho proporcional à tela
-    └── root.minsize(800, 420)
+    └── root.minsize(800, 480)
 
-07. Construção da interface
+08. Construção da interface
     ├── main (Frame) → título + subtítulo
     ├── container    → níveis com botões arredondados
     ├── btn_10fast   → botão extra
     └── rodape       → texto informativo
 
-08. root.mainloop() → loop de eventos Tkinter
+09. root.mainloop() → loop de eventos Tkinter
 ```
 
 ---
@@ -165,12 +175,16 @@ Isso produz cantos arredondados visualmente suaves sem depender de imagens exter
 pip install pyinstaller
 python -m PyInstaller --onefile --noconsole `
     --name "Speed DMT 2" `
+    --icon=icon.ico `
+    --add-data "icon.ico;." `
     --distpath "Caminho\Para\ProjetoPy" `
     dancemat_typing.py
 ```
 
 - `--onefile`: Gera um único .exe portátil
 - `--noconsole`: Oculta o terminal ao executar
+- `--icon=icon.ico`: Ícone do arquivo .exe no Explorer
+- `--add-data "icon.ico;."`: Embute o .ico dentro do .exe onefile
 
 ---
 
