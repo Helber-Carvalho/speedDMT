@@ -19,7 +19,7 @@ def resource_path(relative_path):
 
 
 # Timestamp de build (usado para detectar atualizações)
-BUILD_TIMESTAMP = "2026-07-23T19:41:49Z"
+BUILD_TIMESTAMP = "2026-07-23T19:50:00Z"
 
 GITHUB_REPO = "Helber-Carvalho/speedDMT"
 GITHUB_API_COMMITS = f"https://api.github.com/repos/{GITHUB_REPO}/commits/main"

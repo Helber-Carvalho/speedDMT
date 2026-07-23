@@ -199,6 +199,29 @@ python -m PyInstaller --onefile --noconsole --noupx `
 
 ---
 
+---
+
+## Auto-Update
+
+O app verifica automaticamente se há uma nova versão no repositório:
+
+1. **1 segundo** após abrir, uma thread consulta a API do GitHub:
+   `api.github.com/repos/Helber-Carvalho/speedDMT/commits/main`
+2. Obtém a data do **último commit** (`committer.date`)
+3. Compara com o `BUILD_TIMESTAMP` gravado no código
+4. Se o commit remoto for mais recente, pergunta se deseja baixar e instalar
+5. Se sim, baixa o .exe do raw do GitHub e aplica a substituição via `.bat`
+
+**Ao publicar uma atualização:**
+
+1. Faça as alterações no código
+2. Atualize `BUILD_TIMESTAMP` no código com a data do último commit (formato ISO: `2026-07-23T19:50:00Z`)
+3. Recompile com PyInstaller
+4. Faça commit e push (incluindo o .exe)
+5. Os usuários existentes receberão o aviso de atualização na próxima execução
+
+---
+
 ## Requisitos
 
 - Python 3.6+
