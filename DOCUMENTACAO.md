@@ -70,6 +70,7 @@ flowchart TB
 ProjetoPy/
 ├── dancemat_typing.py    # Código fonte principal
 ├── icon.ico              # Ícone personalizado
+├── version_info.txt      # Metadados de versão para o .exe
 ├── Speed DMT 2.exe       # Executável compilado (PyInstaller)
 └── DOCUMENTACAO.md       # Este arquivo
 ```
@@ -173,18 +174,21 @@ Isso produz cantos arredondados visualmente suaves sem depender de imagens exter
 
 ```powershell
 pip install pyinstaller
-python -m PyInstaller --onefile --noconsole `
+python -m PyInstaller --onefile --noconsole --noupx `
     --name "Speed DMT 2" `
     --icon=icon.ico `
     --add-data "icon.ico;." `
+    --version-file version_info.txt `
     --distpath "Caminho\Para\ProjetoPy" `
     dancemat_typing.py
 ```
 
 - `--onefile`: Gera um único .exe portátil
 - `--noconsole`: Oculta o terminal ao executar
+- `--noupx`: Desativa UPX (reduz alarmes falsos de antivírus)
 - `--icon=icon.ico`: Ícone do arquivo .exe no Explorer
 - `--add-data "icon.ico;."`: Embute o .ico dentro do .exe onefile
+- `--version-file`: Adiciona metadados (empresa, descrição, versão) ao .exe
 
 ---
 
