@@ -1,9 +1,14 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 import webbrowser
 import ctypes
 import os
 import sys
+import threading
+import json
+import urllib.request
+import subprocess
+import datetime
 
 
 def resource_path(relative_path):
@@ -11,6 +16,88 @@ def resource_path(relative_path):
     if hasattr(sys, '_MEIPASS'):
         return os.path.join(sys._MEIPASS, relative_path)
     return os.path.join(os.path.abspath("."), relative_path)
+
+
+# Timestamp de build (usado para detectar atualizações)
+BUILD_TIMESTAMP = "2026-07-23T16:40:58Z"
+
+GITHUB_REPO = "Helber-Carvalho/speedDMT"
+GITHUB_API_COMMITS = f"https://api.github.com/repos/{GITHUB_REPO}/commits/main"
+GITHUB_EXE_URL = f"https://github.com/{GITHUB_REPO}/raw/main/Speed%20DMT%202.exe"
+
+
+def _get_exe_path():
+    if getattr(sys, 'frozen', False):
+        return sys.executable
+    return os.path.abspath(__file__)
+
+
+def _check_update(root):
+    def _task():
+        try:
+            req = urllib.request.Request(
+                GITHUB_API_COMMITS,
+                headers={"User-Agent": "SpeedDMT/3.1", "Accept": "application/vnd.github.v3+json"}
+            )
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                data = json.loads(resp.read())
+            remote_date = data["commit"]["committer"]["date"]
+            if remote_date > BUILD_TIMESTAMP:
+                root.after(0, lambda: _apply_update(root))
+        except:
+            pass
+
+    t = threading.Thread(target=_task, daemon=True)
+    t.start()
+
+
+def _apply_update(root):
+    if not messagebox.askyesno(
+        "Atualização Disponível",
+        "Nova versão encontrada no repositório!\n\n"
+        "Deseja baixar e instalar automaticamente?\n"
+        "O aplicativo será fechado para aplicar a atualização.",
+        parent=root
+    ):
+        return
+
+    try:
+        with urllib.request.urlopen(GITHUB_EXE_URL, timeout=30) as resp:
+            new_data = resp.read()
+
+        temp = os.path.join(os.environ["TEMP"], "Speed DMT 2.new.exe")
+        with open(temp, "wb") as f:
+            f.write(new_data)
+
+        current = _get_exe_path()
+        bat = os.path.join(os.environ["TEMP"], "update_speeddmt.bat")
+        with open(bat, "w", newline="\r\n") as f:
+            f.write(f"""@echo off
+chcp 65001 >nul
+:wait
+tasklist /fi "IMAGENAME eq Speed DMT 2.exe" 2>nul | find /i "Speed DMT 2.exe" >nul
+if not errorlevel 1 (
+    timeout /t 1 /nobreak >nul
+    goto wait
+)
+copy /y "{temp}" "{current}" >nul
+del /q "{temp}"
+start "" "{current}"
+del "%~f0"
+""")
+
+        subprocess.Popen(
+            ["cmd.exe", "/c", bat],
+            creationflags=subprocess.CREATE_NO_WINDOW,
+            close_fds=True
+        )
+        root.quit()
+    except:
+        messagebox.showerror(
+            "Erro",
+            "Não foi possível baixar a atualização.\nVerifique sua conexão e tente novamente.",
+            parent=root
+        )
 
 
 # Paleta de cores - tema verde escuro
@@ -173,6 +260,7 @@ root.title("Dance Mat Typing - Speed DMT 2")
 root.configure(bg=COR_FUNDO)
 
 root.after(100, lambda: _set_app_icon(root))
+root.after(1000, lambda: _check_update(root))
 
 style = ttk.Style()
 style.theme_use("clam")

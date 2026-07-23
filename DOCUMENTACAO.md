@@ -79,13 +79,19 @@ ProjetoPy/
 
 ```
 01. Importação das bibliotecas
-    ├── tkinter / ttk   → Interface gráfica
-    ├── webbrowser       → Abrir URLs no navegador
-    ├── ctypes           → API do Windows (ícone na barra de tarefas)
-    ├── os / sys         → resource_path para PyInstaller
+    ├── tkinter / ttk     → Interface gráfica
+    ├── webbrowser         → Abrir URLs no navegador
+    ├── ctypes             → API do Windows (ícone na barra de tarefas)
+    ├── os / sys           → resource_path para PyInstaller
+    ├── threading / json / → Auto-update via GitHub API
+    │   urllib / subprocess
 
-02. Função auxiliar
-    └── resource_path()  → Localiza arquivos dentro do .exe (onefile)
+02. Constantes e funções auxiliares
+    ├── resource_path()     → Localiza arquivos dentro do .exe (onefile)
+    ├── BUILD_TIMESTAMP     → Data de build para comparar atualizações
+    ├── _get_exe_path()     → Localiza o executável atual
+    ├── _check_update()     → Thread: consulta último commit no GitHub
+    └── _apply_update()     → Baixa .exe, cria .bat de substituição e reinicia
 
 03. Constantes de cor
     ├── COR_FUNDO     → #333333 (cinza escuro)
@@ -102,11 +108,12 @@ ProjetoPy/
 05. Dicionário stages
     └── Mapeia cada nível → (cor, [(nome_estágio, url), ...])
 
-06. Funções auxiliares
+06. Funções da interface
     ├── open_url(url)               → webbrowser.open()
     ├── criar_botao_arredondado()   → Canvas com cantos arredondados
     ├── criar_label_responsivo()    → Label com wraplength dinâmico
-    └── _set_app_icon()             → Ícone na barra de tarefas (Win32 API)
+    ├── _set_app_icon()             → Ícone na barra de tarefas (Win32 API)
+    └── _check_update / _apply_update → Auto-update
 
 07. Configuração da janela (19:9 centralizado)
     ├── root.geometry(...)  → tamanho proporcional à tela
