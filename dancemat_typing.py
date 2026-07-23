@@ -19,12 +19,17 @@ def resource_path(relative_path):
 
 
 # Timestamp de build (usado para detectar atualizações)
-BUILD_TIMESTAMP = "2026-07-23T19:50:00Z"
+BUILD_TIMESTAMP = "2026-07-23T19:55:00Z"
 
 GITHUB_REPO = "Helber-Carvalho/speedDMT"
 GITHUB_API_COMMITS = f"https://api.github.com/repos/{GITHUB_REPO}/commits/main"
 GITHUB_EXE_URL = f"https://github.com/{GITHUB_REPO}/raw/main/Speed%20DMT%202.exe"
 
+
+def _get_short_path(path):
+    buf = ctypes.create_unicode_buffer(260)
+    ctypes.windll.kernel32.GetShortPathNameW(path, buf, 260)
+    return buf.value
 
 def _get_exe_path():
     if getattr(sys, 'frozen', False):
@@ -69,19 +74,19 @@ def _apply_update(root):
         with open(temp, "wb") as f:
             f.write(new_data)
 
-        current = _get_exe_path()
-        bat = os.path.join(os.environ["TEMP"], "update_speeddmt.bat")
+        current = _get_short_path(_get_exe_path())
+        temp_short = _get_short_path(temp)
+        bat = os.path.join(_get_short_path(os.environ["TEMP"]), "update_speeddmt.bat")
         with open(bat, "w", newline="\r\n") as f:
             f.write(f"""@echo off
-chcp 65001 >nul
 :wait
 tasklist /fi "IMAGENAME eq Speed DMT 2.exe" 2>nul | find /i "Speed DMT 2.exe" >nul
 if not errorlevel 1 (
     timeout /t 1 /nobreak >nul
     goto wait
 )
-copy /y "{temp}" "{current}" >nul
-del /q "{temp}"
+copy /y "{temp_short}" "{current}" >nul
+del /q "{temp_short}"
 start "" "{current}"
 del "%~f0"
 """)
