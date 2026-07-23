@@ -1,17 +1,15 @@
-# =============================================================================
-# Dance Mat Typing - Lançador de Estágios
-# Versão: 3.1
-# Descrição: Interface para acessar os estágios do Dance Mat Typing (BBC)
-#            e o site 10 Fast Fingers. Design responsivo com tema verde.
-# =============================================================================
-
 import tkinter as tk
 from tkinter import ttk
 import webbrowser
+import ctypes
+import os
+import sys
 
-# =============================================================================
-# PALETA DE CORES - TEMA VERDE
-# =============================================================================
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
+
 COR_FUNDO     = "#333333"
 COR_FRAME     = "#2a2a2a"
 COR_TITULO    = "#6cc24a"
@@ -30,38 +28,39 @@ COR_BOTAO_TEXTO = "#FFFFFF"
 URL_LEVEL1 = "https://www.bbc.co.uk/games/interactive/activity-dance-mat-typing?exitGameUrl=http%3A%2F%2Fwww.bbc.co.uk%2Fguides%2Fz3c6tfr"
 URL_LEVEL2 = "https://www.bbc.co.uk/games/interactive/activity-dance-mat-typing-level2?exitGameUrl=http%3A%2F%2Fwww.bbc.co.uk%2Fguides%2Fz3c6tfr"
 URL_LEVEL3 = "https://www.bbc.co.uk/games/interactive/activity-dance-mat-typing-level3?exitGameUrl=http%3A%2F%2Fwww.bbc.co.uk%2Fguides%2Fz3c6tfr"
+URL_LEVEL4 = "https://www.bbc.co.uk/games/interactive/activity-dance-mat-typing-level4?exitGameUrl=http%3A%2F%2Fwww.bbc.co.uk%2Fguides%2Fz3c6tfr"
 
 stages = {
-    "Nível 1": (
+    "N\u00edvel 1": (
         COR_NIVEL1,
         [
-            ("Estágio 1 - Home Row", URL_LEVEL1),
-            ("Estágio 2 - EI",       URL_LEVEL1),
-            ("Estágio 3 - RU",       URL_LEVEL1),
+            ("Est\u00e1gio 1 - Home Row", URL_LEVEL1),
+            ("Est\u00e1gio 2 - EI",       URL_LEVEL1),
+            ("Est\u00e1gio 3 - RU",       URL_LEVEL1),
         ],
     ),
-    "Nível 2": (
+    "N\u00edvel 2": (
         COR_NIVEL2,
         [
-            ("Estágio 4 - TY", URL_LEVEL2),
-            ("Estágio 5 - WO", URL_LEVEL2),
-            ("Estágio 6 - QP", URL_LEVEL2),
+            ("Est\u00e1gio 4 - TY", URL_LEVEL2),
+            ("Est\u00e1gio 5 - WO", URL_LEVEL2),
+            ("Est\u00e1gio 6 - QP", URL_LEVEL2),
         ],
     ),
-    "Nível 3": (
+    "N\u00edvel 3": (
         COR_NIVEL3,
         [
-            ("Estágio 7 - VM",  URL_LEVEL3),
-            ("Estágio 8 - BN",  URL_LEVEL3),
-            ("Estágio 9 - C,",  URL_LEVEL3),
+            ("Est\u00e1gio 7 - VM",  URL_LEVEL3),
+            ("Est\u00e1gio 8 - BN",  URL_LEVEL3),
+            ("Est\u00e1gio 9 - C,",  URL_LEVEL3),
         ],
     ),
-    "Nível 4": (
+    "N\u00edvel 4": (
         COR_NIVEL4,
         [
-            ("Estágio 10 - XZ",         URL_LEVEL3),
-            ("Estágio 11 - /.",         URL_LEVEL3),
-            ("Estágio 12 - Shift keys", URL_LEVEL3),
+            ("Est\u00e1gio 10 - XZ",         URL_LEVEL4),
+            ("Est\u00e1gio 11 - /.",         URL_LEVEL4),
+            ("Est\u00e1gio 12 - Shift keys", URL_LEVEL4),
         ],
     ),
 }
@@ -71,9 +70,6 @@ def open_url(url):
     webbrowser.open(url)
 
 
-# -------------------------------------------------------------------------
-# BOTÃO ARREDONDADO (Canvas-based)
-# -------------------------------------------------------------------------
 def criar_botao_arredondado(parent, texto, cor_fundo, comando, altura=40, raio=14):
     canvas = tk.Canvas(
         parent,
@@ -132,9 +128,6 @@ def criar_botao_arredondado(parent, texto, cor_fundo, comando, altura=40, raio=1
     return canvas
 
 
-# -------------------------------------------------------------------------
-# LABEL COM WRAP RESPONSIVO
-# -------------------------------------------------------------------------
 def criar_label_responsivo(parent, text, **kwargs):
     label = tk.Label(parent, text=text, **kwargs)
 
@@ -147,14 +140,29 @@ def criar_label_responsivo(parent, text, **kwargs):
     return label
 
 
-# =============================================================================
-# JANELA PRINCIPAL
-# =============================================================================
+def _set_app_icon(window):
+    try:
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('speeddmt.typing.1')
+    except:
+        pass
+    try:
+        icon_path = resource_path('icon.ico')
+        if os.path.exists(icon_path):
+            window.iconbitmap(icon_path)
+            hwnd = ctypes.windll.user32.GetParent(window.winfo_id())
+            icon_handle = ctypes.windll.user32.LoadImageW(0, icon_path, 1, 0, 0, 0x00000010)
+            if icon_handle:
+                ctypes.windll.user32.SendMessageW(hwnd, 0x0080, 0, icon_handle)
+                ctypes.windll.user32.SendMessageW(hwnd, 0x0080, 1, icon_handle)
+    except:
+        pass
+
 root = tk.Tk()
 root.title("Dance Mat Typing - Speed DMT 2")
 root.configure(bg=COR_FUNDO)
 
-# Estilo da scrollbar compatível com o tema escuro
+root.after(100, lambda: _set_app_icon(root))
+
 style = ttk.Style()
 style.theme_use("clam")
 style.configure(
@@ -166,7 +174,6 @@ style.configure(
     gripcount=0,
 )
 
-# Tamanho 19:9 centralizado
 sw = root.winfo_screenwidth()
 sh = root.winfo_screenheight()
 
@@ -182,11 +189,9 @@ y = (sh - wh) // 2
 root.geometry(f"{ww}x{wh}+{x}+{y}")
 root.minsize(800, 480)
 
-# Frame principal
 main = tk.Frame(root, bg=COR_FUNDO, padx=24, pady=20)
 main.pack(fill=tk.BOTH, expand=True)
 
-# TÍTULO
 titulo = criar_label_responsivo(
     main,
     text="Dance Mat Typing",
@@ -197,10 +202,9 @@ titulo = criar_label_responsivo(
 )
 titulo.pack(fill=tk.X)
 
-# SUBTÍTULO
 subtitulo = criar_label_responsivo(
     main,
-    text="Escolha um estágio para praticar digitação!",
+    text="Escolha um est\u00e1gio para praticar digita\u00e7\u00e3o!",
     font=("Segoe UI", 11),
     fg=COR_SUBTITULO,
     bg=COR_FUNDO,
@@ -210,10 +214,6 @@ subtitulo.pack(fill=tk.X)
 
 ttk.Separator(main, orient="horizontal").pack(fill=tk.X, pady=12)
 
-# =========================================================================
-# CONTAINER ROLÁVEL (SCROLL)
-#   Usa Canvas + Scrollbar + Frame interno para suportar scroll do mouse
-# =========================================================================
 scroll_canvas = tk.Canvas(main, bg=COR_FUNDO, highlightthickness=0)
 scroll_bar = ttk.Scrollbar(main, orient="vertical", command=scroll_canvas.yview)
 scroll_canvas.configure(yscrollcommand=scroll_bar.set)
@@ -239,7 +239,6 @@ scroll_canvas.bind("<Leave>", _scroll_leave)
 scroll_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 scroll_bar.pack(side=tk.RIGHT, fill=tk.Y)
 
-# NÍVEIS
 for level_name, (cor_nivel, stage_list) in stages.items():
     frame_nivel = tk.Frame(scroll_frame, bg=COR_FUNDO, pady=4)
     frame_nivel.pack(fill=tk.X, pady=3)
@@ -262,7 +261,6 @@ for level_name, (cor_nivel, stage_list) in stages.items():
 
 ttk.Separator(scroll_frame, orient="horizontal").pack(fill=tk.X, pady=10)
 
-# 10 FAST FINGERS
 btn_10fast = criar_botao_arredondado(
     scroll_frame,
     "10 Fast Fingers - Text Practice (PT)",
@@ -275,10 +273,9 @@ btn_10fast = criar_botao_arredondado(
 )
 btn_10fast.pack(fill=tk.X, pady=4)
 
-# RODAPÉ
 rodape = criar_label_responsivo(
     scroll_frame,
-    text="Desenvolvido para alunos aprenderem digitação de forma divertida!",
+    text="Desenvolvido para alunos aprenderem digita\u00e7\u00e3o de forma divertida!",
     font=("Segoe UI", 8),
     fg=COR_TEXTO_CLARO,
     bg=COR_FUNDO,
@@ -286,7 +283,6 @@ rodape = criar_label_responsivo(
 )
 rodape.pack(fill=tk.X)
 
-# CRÉDITOS
 creditos = criar_label_responsivo(
     scroll_frame,
     text="crie conosco OpenSurceFriends  |  helbercarvalho8@gmail.com",
