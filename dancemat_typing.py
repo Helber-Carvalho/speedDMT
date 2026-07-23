@@ -8,7 +8,7 @@ import threading
 import json
 import urllib.request
 import subprocess
-import datetime
+from datetime import datetime, timedelta, timezone
 
 
 def resource_path(relative_path):
@@ -19,7 +19,7 @@ def resource_path(relative_path):
 
 
 # Timestamp de build (usado para detectar atualizações)
-BUILD_TIMESTAMP = "2026-07-23T19:55:00Z"
+BUILD_TIMESTAMP = "2026-07-23T20:00:00Z"
 
 GITHUB_REPO = "Helber-Carvalho/speedDMT"
 GITHUB_API_COMMITS = f"https://api.github.com/repos/{GITHUB_REPO}/commits/main"
@@ -46,8 +46,10 @@ def _check_update(root):
             )
             with urllib.request.urlopen(req, timeout=5) as resp:
                 data = json.loads(resp.read())
-            remote_date = data["commit"]["committer"]["date"]
-            if remote_date > BUILD_TIMESTAMP:
+            remote_raw = data["commit"]["committer"]["date"]
+            remote_dt = datetime.fromisoformat(remote_raw.replace("Z", "+00:00"))
+            build_dt = datetime.fromisoformat(BUILD_TIMESTAMP.replace("Z", "+00:00"))
+            if remote_dt > build_dt + timedelta(days=1):
                 root.after(0, lambda: _apply_update(root))
         except:
             pass
